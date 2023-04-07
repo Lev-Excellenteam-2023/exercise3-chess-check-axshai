@@ -96,7 +96,9 @@ def main():
     if not os.path.exists('logs'):
         print("creat")
         os.makedirs('logs')
-    logging.basicConfig(filename=os.path.join("logs",time.strftime('log_%H_%M_%S_%d_%m_%Y.log')), level=logging.DEBUG, format='[%(asctime)s] %(levelname)s: %(message)s')
+    logging.basicConfig(level=logging.DEBUG,
+                        format='[%(asctime)s] %(levelname)s: %(message)s',
+                        handlers = [logging.FileHandler(os.path.join("logs",time.strftime('log_%H_%M_%S_%d_%m_%Y.log'))), logging.StreamHandler()])
     logging.info("""
     ------------------------------
          starting new game
