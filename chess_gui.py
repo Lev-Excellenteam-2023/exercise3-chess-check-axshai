@@ -5,6 +5,9 @@
 # Note: The pygame tutorial by Eddie Sharick was used for the GUI engine. The GUI code was altered by Boo Sung Kim to
 # fit in with the rest of the project.
 #
+import datetime
+import os.path
+
 import chess_engine
 import pygame as py
 
@@ -89,7 +92,11 @@ def highlight_square(screen, game_state, valid_moves, square_selected):
 
 
 def main():
-    logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(levelname)s: %(message)s')
+    time = datetime.datetime.now()
+    if not os.path.exists('logs'):
+        print("creat")
+        os.makedirs('logs')
+    logging.basicConfig(filename=os.path.join("logs",time.strftime('log_%H_%M_%S_%d_%m_%Y.log')), level=logging.DEBUG, format='[%(asctime)s] %(levelname)s: %(message)s')
     logging.info("""
     ------------------------------
          starting new game
