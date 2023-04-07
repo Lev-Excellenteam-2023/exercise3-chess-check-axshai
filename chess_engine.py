@@ -875,14 +875,18 @@ class game_state:
             self.number_of_checks +=1
         return [_checks, _pins, _pins_check]
 
-    def get_all_pieces(self, player: Player):
+    def get_all_pieces(self):
+        board_str = ""
         pieces = []
         for r in range(8):
             for c in range(8):
                 piece = self.get_piece(r, c)
-                if hasattr(piece, "is_player") and piece.is_player(player):
-                    pieces.append(piece)
-        return pieces
+                if hasattr(piece, "get_player"):
+                    board_str += (piece.get_player() + " " + piece.get_name()).ljust(max(len(Player.PLAYER_1) + 2,len(Player.PLAYER_2)+ 2)) + "\t"
+                else:
+                    board_str += "".ljust(max(len(Player.PLAYER_1)+ 2,len(Player.PLAYER_2)+ 2), "-") + "\t"
+            board_str += "\n"
+        return board_str
 
 
 class chess_move():
