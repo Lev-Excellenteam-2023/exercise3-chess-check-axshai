@@ -875,6 +875,15 @@ class game_state:
             self.number_of_checks +=1
         return [_checks, _pins, _pins_check]
 
+    def get_all_pieces(self, player: Player):
+        pieces = []
+        for r in range(8):
+            for c in range(8):
+                piece = self.get_piece(r, c)
+                if hasattr(piece, "is_player") and piece.is_player(player):
+                    pieces.append(piece)
+        return pieces
+
 
 class chess_move():
     def __init__(self, starting_square, ending_square, game_state, in_check):

@@ -166,6 +166,8 @@ def main():
                             king_loc = game_state.white_king_location if moving_player != Player.PLAYER_1 else game_state.black_king_location
                             if game_state.check_for_check(king_loc, second_player, True)[0]:
                                 logging.info(f"there is a check on {second_player} king!. number of checks untill now: {game_state.number_of_checks}")
+                            logging.debug(all_pieces_to_str(game_state, moving_player))
+                            logging.debug(all_pieces_to_str(game_state, second_player))
                             square_selected = ()
                             player_clicks = []
                             valid_moves = []
@@ -177,6 +179,8 @@ def main():
                                 if game_state.check_for_check(king_loc, moving_player, True)[0]:
                                     logging.info(
                                         f"there is a check on {moving_player} king!. number of checks untill now: {game_state.number_of_checks}")
+                                logging.debug(all_pieces_to_str(game_state, moving_player))
+                                logging.debug(all_pieces_to_str(game_state, second_player))
                             elif human_player is 'b':
                                 ai_move = ai.minimax_black(game_state, 3, -100000, 100000, True, Player.PLAYER_1)
                                 game_state.move_piece(ai_move[0], ai_move[1], True)
@@ -184,6 +188,8 @@ def main():
                                 if game_state.check_for_check(king_loc, moving_player, True)[0]:
                                     logging.info(
                                         f"there is a check on {moving_player} king!. number of checks untill now: {game_state.number_of_checks}")
+                                logging.debug(all_pieces_to_str(game_state, moving_player))
+                                logging.debug(all_pieces_to_str(game_state, second_player))
                     else:
                         valid_moves = game_state.get_valid_moves((row, col))
                         if valid_moves is None:
@@ -228,6 +234,14 @@ def draw_text(screen, text):
     text_location = py.Rect(0, 0, WIDTH, HEIGHT).move(WIDTH / 2 - text_object.get_width() / 2,
                                                       HEIGHT / 2 - text_object.get_height() / 2)
     screen.blit(text_object, text_location)
+
+
+def all_pieces_to_str(game_state, player):
+    print(player)
+    pieces_str = f"{player} pieces:\n"
+    for piece in game_state.get_all_pieces(player):
+        pieces_str += f"{piece.get_name()} located at {(piece.get_row_number(), piece.get_col_number())}\n"
+    return pieces_str
 
 
 if __name__ == "__main__":
