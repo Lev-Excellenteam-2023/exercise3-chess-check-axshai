@@ -40,7 +40,7 @@ class chess_ai:
             max_evaluation = -10000000
             all_possible_moves = game_state.get_all_legal_moves("black")
             for move_pair in all_possible_moves:
-                game_state.move_piece(move_pair[0], move_pair[1], True)
+                game_state.move_piece(move_pair[0], move_pair[1], True, is_fake=True)
                 evaluation = self.minimax_white(game_state, depth - 1, alpha, beta, False, "white")
                 game_state.undo_move()
 
@@ -58,7 +58,7 @@ class chess_ai:
             min_evaluation = 10000000
             all_possible_moves = game_state.get_all_legal_moves("white")
             for move_pair in all_possible_moves:
-                game_state.move_piece(move_pair[0], move_pair[1], True)
+                game_state.move_piece(move_pair[0], move_pair[1], True, is_fake=True)
                 evaluation = self.minimax_white(game_state, depth - 1, alpha, beta, True, "black")
                 game_state.undo_move()
 
@@ -97,7 +97,7 @@ class chess_ai:
             max_evaluation = -10000000
             all_possible_moves = game_state.get_all_legal_moves("white")
             for move_pair in all_possible_moves:
-                game_state.move_piece(move_pair[0], move_pair[1], True)
+                game_state.move_piece(move_pair[0], move_pair[1], True, is_fake=True)
                 evaluation = self.minimax_black(game_state, depth - 1, alpha, beta, False, "black")
                 game_state.undo_move()
 
@@ -115,7 +115,7 @@ class chess_ai:
             min_evaluation = 10000000
             all_possible_moves = game_state.get_all_legal_moves("black")
             for move_pair in all_possible_moves:
-                game_state.move_piece(move_pair[0], move_pair[1], True)
+                game_state.move_piece(move_pair[0], move_pair[1], True, is_fake=True)
                 evaluation = self.minimax_black(game_state, depth - 1, alpha, beta, True, "white")
                 game_state.undo_move()
 

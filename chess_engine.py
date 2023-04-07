@@ -4,6 +4,8 @@
 #
 # Note: move log class inspired by Eddie Sharick
 #
+import logging
+
 from Piece import Rook, Knight, Bishop, Queen, King, Pawn
 from enums import Player
 
@@ -30,6 +32,8 @@ class game_state:
     def __init__(self):
         # The board is a 2D array
         # TODO: Change to a numpy format later
+        self.knight_moves_counter_dict = {Player.PLAYER_1: 1, Player.PLAYER_2: 1}
+        self.number_of_checks = 0
         self.white_captives = []
         self.black_captives = []
         self.move_log = []
@@ -118,7 +122,7 @@ class game_state:
         evaluated_piece = self.get_piece(row, col)
         return (evaluated_piece is not None) and (evaluated_piece != Player.EMPTY)
 
-    def get_valid_moves(self, starting_square):
+    def get_valid_moves(self, starting_square, is_fake=False):
         '''
         remove pins from valid moves (unless the pinned piece move can get rid of a check and checks is empty
         remove move from valid moves if the move falls within a check piece's valid move
@@ -217,8 +221,8 @@ class game_state:
 
     # 0 if white lost, 1 if black lost, 2 if stalemate, 3 if not game over
     def checkmate_stalemate_checker(self):
-        all_white_moves = self.get_all_legal_moves(Player.PLAYER_1)
-        all_black_moves = self.get_all_legal_moves(Player.PLAYER_2)
+        all_white_moves = self.get_all_legal_moves(Player.PLAYER_1, True)
+        all_black_moves = self.get_all_legal_moves(Player.PLAYER_2, True)
         if self._is_check and self.whose_turn() and not all_white_moves:
             print("white lost")
             return 0
@@ -230,7 +234,7 @@ class game_state:
         else:
             return 3
 
-    def get_all_legal_moves(self, player):
+    def get_all_legal_moves(self, player, is_fake=True):
         # _all_valid_moves = [[], []]
         # for row in range(0, 8):
         #     for col in range(0, 8):
@@ -243,7 +247,7 @@ class game_state:
         for row in range(0, 8):
             for col in range(0, 8):
                 if self.is_valid_piece(row, col) and self.get_piece(row, col).is_player(player):
-                    valid_moves = self.get_valid_moves((row, col))
+                    valid_moves = self.get_valid_moves((row, col), is_fake)
                     for move in valid_moves:
                         _all_valid_moves.append(((row, col), move))
         return _all_valid_moves
@@ -307,7 +311,7 @@ class game_state:
         return self._en_passant_previous
 
     # Move a piece
-    def move_piece(self, starting_square, ending_square, is_ai):
+    def move_piece(self, starting_square, ending_square, is_ai, is_fake=False):
         current_square_row = starting_square[0]  # The integer row value of the starting square
         current_square_col = starting_square[1]  # The integer col value of the starting square
         next_square_row = ending_square[0]  # The integer row value of the ending square
@@ -322,10 +326,9 @@ class game_state:
             # The chess piece at the starting square
             moving_piece = self.get_piece(current_square_row, current_square_col)
 
-            valid_moves = self.get_valid_moves(starting_square)
+            valid_moves = self.get_valid_moves(starting_square, is_fake)
 
             temp = True
-
             if ending_square in valid_moves:
                 moved_to_piece = self.get_piece(next_square_row, next_square_col)
                 if moving_piece.get_name() is "k":
@@ -455,6 +458,11 @@ class game_state:
                         self.move_log.append(chess_move(starting_square, ending_square, self, self._is_check))
                         self.can_en_passant_bool = False
                 else:
+                    if not is_fake and moving_piece.get_name() is "n":
+                        p_color = Player.PLAYER_1 if moving_piece.is_player(Player.PLAYER_1) else Player.PLAYER_2
+                        logging.info(f"{p_color} knight performing move. number of moves:"
+                                     f" {self.knight_moves_counter_dict[p_color]}")
+                        self.knight_moves_counter_dict[p_color] += 1
                     self.move_log.append(chess_move(starting_square, ending_square, self, self._is_check))
                     self.can_en_passant_bool = False
 
@@ -465,6 +473,7 @@ class game_state:
                     self.board[current_square_row][current_square_col] = Player.EMPTY
 
                 self.white_turn = not self.white_turn
+                return moving_piece.get_player()
 
             else:
                 pass
@@ -557,6 +566,14 @@ class game_state:
     def whose_turn(self):
         return self.white_turn
 
+    @property
+    def white_king_location(self):
+        return self._white_king_location
+
+    @property
+    def black_king_location(self):
+        return self._black_king_location
+
     '''
     check for immediate check
     - check 8 directions and 8 knight squares
@@ -568,7 +585,7 @@ class game_state:
      - if there are no valid moves to prevent check, checkmate
     '''
 
-    def check_for_check(self, king_location, player):
+    def check_for_check(self, king_location, player, to_count=False):
         # self._is_check = False
         _checks = []
         _pins = []
@@ -854,6 +871,8 @@ class game_state:
                     # self._is_check = True
                     _checks.append((king_location_row + row_change[i], king_location_col + col_change[i]))
         # print([_checks, _pins, _pins_check])
+        if len(_checks) and to_count:
+            self.number_of_checks +=1
         return [_checks, _pins, _pins_check]
 
 
