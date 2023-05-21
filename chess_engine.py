@@ -878,9 +878,9 @@ class game_state:
     def get_all_pieces(self):
         board_str = ""
         pieces = []
-        for r in range(8):
-            for c in range(8):
-                piece = self.get_piece(r, c)
+        for row in range(8):
+            for column in range(8):
+                piece = self.get_piece(row, column)
                 if hasattr(piece, "get_player"):
                     board_str += (piece.get_player() + " " + piece.get_name()).ljust(max(len(Player.PLAYER_1) + 2,len(Player.PLAYER_2)+ 2)) + "\t"
                 else:
